@@ -26,7 +26,7 @@ public class Movie {
     return name;
   }
 
-  public int getMinutes() {
+  public Integer getMinutes() {
     return minutes;
   }
 

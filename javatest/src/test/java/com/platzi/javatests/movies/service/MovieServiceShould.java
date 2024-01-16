@@ -6,12 +6,11 @@ import com.platzi.javatests.movies.model.Movie;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -52,5 +51,47 @@ public class MovieServiceShould {
   }
   private static List<Integer> getMoviesIds(Collection<Movie> moviesByGenre) {
     return moviesByGenre.stream().map(Movie::getId).collect(Collectors.toList());
+  }
+
+  @Nested
+  @DisplayName("when searching movies by multiple attributes")
+  class SearchByTemplateMethod {
+
+    @Test
+    @DisplayName("using id")
+    void whenUsingId() {
+      Collection<Movie> movies = movieService.findByTemplate(new Movie(5, null, null, Genre.ACTION, null));
+      assertEquals(Collections.singletonList(5), getMoviesIds(movies));
+    }
+
+    @Test
+    @DisplayName("using negative minutes")
+    void whenUsingNegativeMinutes() {
+      assertThrows(
+              IllegalArgumentException.class,
+              () -> movieService.findByTemplate(new Movie(null, null, -15, Genre.ACTION, null))
+      );
+    }
+
+    @Test
+    @DisplayName("using genre and minutes")
+    void whenUsingGenreAndMinutes() {
+      Collection<Movie> movies = movieService.findByTemplate(new Movie(null, null, 180, Genre.ACTION, null));
+      assertEquals(Arrays.asList(1, 5), getMoviesIds(movies));
+    }
+
+    @Test
+    @DisplayName("using name and minutes")
+    void whenUsingNameAndMinutes() {
+      Collection<Movie> movies = movieService.findByTemplate(new Movie(null, "annabelle", 100, null, null));
+      assertEquals(Collections.singletonList(7), getMoviesIds(movies));
+    }
+
+    @Test
+    @DisplayName("using director and minutes")
+    void whenUsingDirectorAndMinutes() {
+      Collection<Movie> movies = movieService.findByTemplate(new Movie(null, null, 110, null, "Chris"));
+      assertEquals(Collections.singletonList(4), getMoviesIds(movies));
+    }
   }
 }
